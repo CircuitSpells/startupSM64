@@ -621,6 +621,10 @@ s32 act_wall_kick_air(struct MarioState *m) {
 }
 
 s32 act_long_jump(struct MarioState *m) {
+    if (m->input & INPUT_Z_PRESSED) {
+        return set_mario_action(m, ACT_GROUND_POUND, 0);
+    }
+
     s32 animation;
     if (!m->marioObj->oMarioLongJumpIsSlow) {
         animation = MARIO_ANIM_FAST_LONGJUMP;
