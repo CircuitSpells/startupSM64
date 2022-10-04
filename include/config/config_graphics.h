@@ -8,10 +8,10 @@
 #define GFX_POOL_SIZE 10000
 
 // Show a watermark on the title screen that reads "Made with HackerSM64", instead of the copyright message.
-#define INTRO_CREDIT
+// #define INTRO_CREDIT
 
 // Spawns floombas on the title screen.
-#define INTRO_FLOOMBAS
+// #define INTRO_FLOOMBAS
 
 // Enables widescreen (16:9) support.
 #define WIDE
@@ -31,7 +31,7 @@
 // #define PUPPYPRINT
 
 // Disables AA (Improves console performance but causes visible seams between unconnected geometry).
-// #define DISABLE_AA
+#define DISABLE_AA
 
 // Makes the coins ia8 64x64 instead of ia16 32x32. Uses new ia8 textures so that vanilla coins look better.
 #define IA8_COINS
@@ -68,7 +68,7 @@
 
 // Uses the star object's model in the star dance cutscene.
 // This has a side effect of making the star dance star also transparent when Mario collects a transparent star.
-// #define STAR_DANCE_USES_STARS_MODEL
+#define STAR_DANCE_USES_STARS_MODEL
 
 // Lightweight directional lighting engine by Fazana. Intended for giving proximity and positional pointlights to small objects.
 // NOTE: Still breaks occasionally, and PUPPYLIGHT_NODE might not work in areas that aren't area 1.
