@@ -351,6 +351,48 @@ void update_flying(struct MarioState *m) {
     m->slideVelZ = m->vel[2];
 }
 
+u32 should_wall_kick(struct MarioState *m) {
+    if (m->flags & MARIO_CAN_FIRSTY_WALLKICK) {
+        if (m->input & INPUT_A_PRESSED) {
+            if (m->heldObj != NULL) {
+                mario_drop_held_object(m);
+            }
+
+            m->faceAngle[1] = m->wallYaw - (m->faceAngle[1] - m->wallYaw);
+            m->faceAngle[1] += 0x8000;
+            m->vel[1] = 52.0f;
+            
+            return TRUE;
+        } else {
+            m->flags &= ~MARIO_CAN_FIRSTY_WALLKICK;
+            m->wallKickTimer = 5;
+        }
+    } else {
+        if ((m->input & INPUT_A_PRESSED) && m->wallKickTimer != 0) {
+            if (m->heldObj != NULL) {
+                mario_drop_held_object(m);
+            }
+
+            m->faceAngle[1] = m->wallYaw - (m->faceAngle[1] - m->wallYaw);
+            m->faceAngle[1] += 0x8000;
+
+            if (m->forwardVel >= 38.0f) {
+                mario_set_forward_vel(m, -16.0f);
+            } else {
+                mario_set_forward_vel(m, -8.0f);
+            }
+
+            m->vel[1] -= 4.0f * (5 - m->wallKickTimer);
+            if (m->vel[1] < -75.0f) {
+                m->vel[1] = -75.0f;
+            }
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
 u32 common_air_action_step(struct MarioState *m, u32 landAction, s32 animation, u32 stepArg) {
     u32 stepResult;
 
@@ -372,39 +414,8 @@ u32 common_air_action_step(struct MarioState *m, u32 landAction, s32 animation, 
             set_mario_animation(m, animation);
 
             if (m->forwardVel > 16.0f) {
-#if ENABLE_RUMBLE
-                queue_rumble_data(5, 40);
-#endif
-                mario_bonk_reflection(m, FALSE);
-                m->faceAngle[1] += 0x8000;
-
-                if (m->wall != NULL) {
-                    set_mario_action(m, ACT_AIR_HIT_WALL, 0);
-                } else {
-                    if (m->vel[1] > 0.0f) {
-                        m->vel[1] = 0.0f;
-                    }
-
-                    //! Hands-free holding. Bonking while no wall is referenced
-                    // sets Mario's action to a non-holding action without
-                    // dropping the object, causing the hands-free holding
-                    // glitch. This can be achieved using an exposed ceiling,
-                    // out of bounds, grazing the bottom of a wall while
-                    // falling such that the final quarter step does not find a
-                    // wall collision, or by rising into the top of a wall such
-                    // that the final quarter step detects a ledge, but you are
-                    // not able to ledge grab it.
-                    // change set_mario_action to drop_and_set_mario_action
-                    // in both conditions to fix this
-                    if (m->forwardVel >= 38.0f) {
-                        m->particleFlags |= PARTICLE_VERTICAL_STAR;
-                        set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
-                    } else {
-                        if (m->forwardVel > 8.0f) {
-                            mario_set_forward_vel(m, -8.0f);
-                        }
-                        return set_mario_action(m, ACT_SOFT_BONK, 0);
-                    }
+                if(should_wall_kick(m)) {
+                    return set_mario_action(m, ACT_WALL_KICK_AIR, 0);
                 }
             } else {
                 mario_set_forward_vel(m, 0.0f);
@@ -607,6 +618,8 @@ s32 act_side_flip(struct MarioState *m) {
 }
 
 s32 act_wall_kick_air(struct MarioState *m) {
+    m->flags |= MARIO_CAN_FIRSTY_WALLKICK;
+
     if (m->input & INPUT_B_PRESSED) {
         return set_mario_action(m, ACT_DIVE, 0);
     }
@@ -771,15 +784,13 @@ s32 act_dive(struct MarioState *m) {
             break;
 
         case AIR_STEP_HIT_WALL:
-            mario_bonk_reflection(m, TRUE);
-            m->faceAngle[0] = 0;
-
-            if (m->vel[1] > 0.0f) {
-                m->vel[1] = 0.0f;
+            if (m->forwardVel > 16.0f) {
+                if(should_wall_kick(m)) {
+                    return set_mario_action(m, ACT_WALL_KICK_AIR, 0);
+                }
+            } else {
+                mario_set_forward_vel(m, 0.0f);
             }
-
-            m->particleFlags |= PARTICLE_VERTICAL_STAR;
-            drop_and_set_mario_action(m, ACT_BACKWARD_AIR_KB, 0);
             break;
 
         case AIR_STEP_HIT_LAVA_WALL:

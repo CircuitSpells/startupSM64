@@ -1365,6 +1365,10 @@ void update_mario_inputs(struct MarioState *m) {
     if (m->doubleJumpTimer > 0) {
         m->doubleJumpTimer--;
     }
+
+    if (!(gMarioState->flags & MARIO_CAN_FIRSTY_WALLKICK) && (gMarioState->action & ACT_GROUP_MASK) != ACT_GROUP_AIRBORNE) {
+        gMarioState->flags |= MARIO_CAN_FIRSTY_WALLKICK;
+    }
 }
 
 /**
@@ -1815,6 +1819,8 @@ void init_mario(void) {
     gMarioState->heldObj = NULL;
     gMarioState->riddenObj = NULL;
     gMarioState->usedObj = NULL;
+
+    gMarioState->flags |= MARIO_CAN_FIRSTY_WALLKICK;
 
     gMarioState->waterLevel = find_water_level(gMarioSpawnInfo->startPos[0], gMarioSpawnInfo->startPos[2]);
 
