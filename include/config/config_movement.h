@@ -24,7 +24,7 @@
 #define HANGING_SPEED 12.0f
 
 // Prevents Mario from falling asleep while idle.
-// #define NO_SLEEP
+#define NO_SLEEP
 
 // Disables fall damage.
 #define NO_FALL_DAMAGE
@@ -72,7 +72,7 @@
 #define FIRSTY_LAST_FRAME 1
 
 // The maximum angle the player can wall kick, in degrees. 0..90. To allow 45 degree wall kicks, you must supply `46` to allow 45 and under.
-#define WALL_KICK_DEGREES 45
+#define WALL_KICK_DEGREES 53
 
 // This is vanilla behavior, disable it to allow ledge grabbing regardless of floor pitch.
 // #define LEDGE_GRABS_CHECK_SLOPE_ANGLE

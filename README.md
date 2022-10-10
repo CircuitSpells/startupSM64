@@ -22,7 +22,9 @@
 
 ## include/config/config_movement.h
 ```C
+#define NO_SLEEP
 #define NO_FALL_DAMAGE_SOUND
 #define NO_GETTING_BURIED
 // #define PLATFORM_DISPLACEMENT_2
+#define WALL_KICK_DEGREES 53
 ```
