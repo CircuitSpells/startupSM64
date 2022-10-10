@@ -357,9 +357,11 @@ u32 should_wall_kick(struct MarioState *m) {
             if (m->heldObj != NULL) {
                 mario_drop_held_object(m);
             }
+
             m->faceAngle[1] = m->wallYaw - (m->faceAngle[1] - m->wallYaw);
             m->faceAngle[1] += 0x8000;
             m->vel[1] = 52.0f;
+            
             return TRUE;
         } else {
             m->flags &= ~MARIO_CAN_FIRSTY_WALLKICK;
@@ -370,12 +372,19 @@ u32 should_wall_kick(struct MarioState *m) {
             if (m->heldObj != NULL) {
                 mario_drop_held_object(m);
             }
+
             m->faceAngle[1] = m->wallYaw - (m->faceAngle[1] - m->wallYaw);
             m->faceAngle[1] += 0x8000;
+
             if (m->forwardVel >= 38.0f) {
                 mario_set_forward_vel(m, -16.0f);
             } else {
                 mario_set_forward_vel(m, -8.0f);
+            }
+
+            m->vel[1] -= 4.0f * (5 - m->wallKickTimer);
+            if (m->vel[1] < -75.0f) {
+                m->vel[1] = -75.0f;
             }
             return TRUE;
         }
