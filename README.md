@@ -1,5 +1,4 @@
 # My Custom Changes
-- Ground pound during long jump
 
 # HackerSM64 Default Flag Changes
 ## include/config/config_cutscenes.h
